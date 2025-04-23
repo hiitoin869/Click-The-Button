@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catch the Button Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+        }
+        #gameArea {
+            width: 600px;
+            height: 400px;
+            margin: 20px auto;
+            position: relative;
+            background-color: #e6f7ff;
+            border: 3px dashed #3399ff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #target {
+            width: 80px;
+            height: 80px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+        #target:hover {
+            transform: scale(1.1);
+        }
+        #scoreDisplay {
+            font-size: 24px;
+            margin: 10px;
+        }
+        #timerDisplay {
+            font-size: 24px;
+            margin: 10px;
+            color: #ff6b6b;
+        }
+        #startButton {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        #startButton:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Catch the Button!</h1>
+    <p>Click the colored button as many times as you can in 30 seconds!</p>
+    
+    <div id="scoreDisplay">Score: 0</div>
+    <div id="timerDisplay">Time: 30</div>
+    <button id="startButton">Start Game</button>
+    
+    <div id="gameArea">
+        <div id="target">CLICK ME!</div>
+    </div>
+
+    <script>
+        const target = document.getElementById('target');
+        const gameArea = document.getElementById('gameArea');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const startButton = document.getElementById('startButton');
+        
+        let score = 0;
+        let timeLeft = 30;
+        let gameActive = false;
+        let timer;
+        let moveTimer;
+        
+        // Move the target to a random position
+        function moveTarget() {
+            if (!gameActive) return;
+            
+            const maxX = gameArea.clientWidth - target.clientWidth;
+            const maxY = gameArea.clientHeight - target.clientHeight;
+            
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+            
+            // Change color randomly
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff9ff3', '#feca57'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            target.style.backgroundColor = randomColor;
+        }
+        
+        // Handle target click
+        target.addEventListener('click', function() {
+            if (!gameActive) return;
+            
+            score++;
+            scoreDisplay.textContent = `Score: ${score}`;
+            moveTarget();
+        });
+        
+        // Start the game
+        startButton.addEventListener('click', function() {
+            if (gameActive) return;
+            
+            gameActive = true;
+            score = 0;
+            timeLeft = 30;
+            scoreDisplay.textContent = `Score: ${score}`;
+            timerDisplay.textContent = `Time: ${timeLeft}`;
+            startButton.disabled = true;
+            
+            // Start timer
+            timer = setInterval(function() {
+                timeLeft--;
+                timerDisplay.textContent = `Time: ${timeLeft}`;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+            
+            // Initial target position
+            moveTarget();
+            
+            // Move target every 1.5 seconds if not clicked
+            moveTimer = setInterval(moveTarget, 1500);
+        });
+        
+        // End the game
+        function endGame() {
+            gameActive = false;
+            clearInterval(timer);
+            clearInterval(moveTimer);
+            startButton.disabled = false;
+            
+            alert(`Game Over! Your score: ${score}`);
+        }
+    </script>
+</body>
+</html>
